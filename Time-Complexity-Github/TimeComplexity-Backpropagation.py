@@ -226,7 +226,6 @@ plt.show()
 I_range = np.linspace(X[:,0].min(), X[:,0].max(),100)
 N_range = np.linspace(X[:,1].min(), X[:,1].max(),100)
 
-
 I_grid, N_grid = np.meshgrid(I_range, N_range)
 
 grid_points = np.hstack([I_grid.reshape(-1,1), N_grid.ravel().reshape(-1,1)])
@@ -236,18 +235,26 @@ fig = plt.figure(figsize=(10,8))
 axis = fig.add_subplot(111, projection = '3d')
 
 P = F-B
+positive_bool_mask = (P>=0).ravel()
+P = P[positive_bool_mask]
+X_positive = X[positive_bool_mask]
+
 Q = F-B
-P[P>=0] = 0.0
-Q[Q<0] = 0.0
-axis.scatter(X[:,0],X[:,1], P, color = 'red', label = 'data')
-axis.scatter(X[:,0],X[:,1], Q, color = 'blue', label = 'data')
+negative_bool_mask = (Q<0).ravel()
+Q = Q[negative_bool_mask]
+X_negative = X[negative_bool_mask]
+
+axis.scatter(X_positive[:,0],X_positive[:,1], P, color = 'blue', label = 'B-F ≥ 0')
+axis.scatter(X_negative[:,0],X_negative[:,1], Q, color = 'red', label = 'B-F < 0')
 
 axis.set_xlabel("Image size (I)")
 axis.set_ylabel("Bottom layer size (N)")
 axis.set_zlabel("Backward minus forward run time (B-F)")
+plt.legend()
+
+print(f" mean: {np.mean(P)}")
 
 plt.show()
-
 ###Scatterplot of differences
 
 ### Plot Function
